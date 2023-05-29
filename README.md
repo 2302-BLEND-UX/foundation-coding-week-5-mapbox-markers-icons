@@ -5,6 +5,7 @@
 
 ### Get started
 To get started, add your Mapbox API key into the script.js
+
 `mapboxgl.accessToken = '<your-api-key>';`
 
 ### Helpful links
