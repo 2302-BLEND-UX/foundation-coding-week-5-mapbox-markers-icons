@@ -1,5 +1,6 @@
 // declare our elements
 const flyToLocation = document.getElementById("fly-to-location");
+const addNewMarkers = document.getElementById("add-new-markers");
 
 // initialise mapbox
 mapboxgl.accessToken = '';
@@ -19,11 +20,19 @@ const map = new mapboxgl.Map({
 map.on('load', () => {
 
     // this will add all of our icons
+    // cafe icon
     map.loadImage('img/icons/cafe-icon.png', function (error, image) {
         if (error) {
             throw error;
         }
         map.addImage('cafe-icon', image);
+    })
+    // pool icon
+    map.loadImage('img/icons/pool-icon.png', function (error, image) {
+        if (error) {
+            throw error;
+        }
+        map.addImage('pool-icon', image);
     })
 
     // this function adds all our places
@@ -138,3 +147,66 @@ flyToLocation.addEventListener("click", function () {
         zoom: 18
     });
 })
+
+// new markers data
+const pools = [
+    {
+        coordinates: [174.867186, -41.142972],
+        description: `<img src="https://picsum.photos/seed/pool/200" alt="random iamge">
+        <p>This is the Cannon's creek pool boiiiiii</p>
+        `,
+        icon: 'pool-icon'
+    },
+    {
+        coordinates: [174.904924, -41.213991],
+        description: `<img src="https://picsum.photos/seed/pool21312/200" alt="random iamge">
+        <p>Huia Pool - staff are angry at each other, but overall cool</p>
+        `,
+        icon: 'pool-icon'
+    }
+]
+
+// this function will gather markers from an array and push them to the mapbox map
+function addPoolMarkers() {
+    // get the marker data
+    let existingMarkers = map.getSource('places')._data;
+
+    // loop over our new markers and add them to the mapbox data
+    for (let i = 0; i < pools.length; i++) {
+        let pool = pools[i];
+
+        // we're declaring a feature object
+        // it's a mapbox piece of data, which it needs to know about, in order to add it to the map
+        let feature = {
+            'type': 'Feature',
+            'properties': {
+                'description': pool.description,
+                'icon': pool.icon
+            },
+            'geometry': {
+                'type': 'Point',
+                'coordinates': pool.coordinates
+            }
+        }
+        // we've established/or declared a feature now, within our loop
+        // also, this feature can be pushed to mapbox
+        existingMarkers.features.push(feature);
+    }
+    //----end of the loop
+    // check our updated markers
+    // console.log(existingMarkers);
+    // rename existing markers to new markers
+    let addNewMarkers = existingMarkers;
+
+    // update the map with the modified data
+    map.getSource('places').setData(addNewMarkers);
+
+    // fly to a more suitable place on the map
+    map.flyTo({
+        center: [174.87360776412174, -41.18343571203791],
+        zoom: 10
+    });
+}
+
+// add new markers - adding pools
+addNewMarkers.addEventListener('click', addPoolMarkers)
